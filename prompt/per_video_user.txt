@@ -1,0 +1,39 @@
+You are processing one video from a playlist. Use the attached video as the sole authoritative source for what was taught.
+
+Metadata (use exactly for the header lines):
+- Video title: {video_title}
+- Video URL: {video_url}
+
+Your output format MUST strictly follow this structure (Markdown). Use the real title and URL from metadata above.
+
+# {video_title}
+
+**Video link:** {video_url}
+
+## 1. Topic Overview
+
+## 2. Key Concepts
+
+## 3. Core Explanation
+
+## 4. Important Technical Details
+
+## 5. Algorithms / Code (if applicable)
+If nothing algorithmic or code-related appears, write: *Not applicable for this video.*
+
+## 6. Complexity Analysis (if applicable)
+Use plain-text Big-O only (e.g. O(n)). Use --> for arrows if needed. If not discussed, write: *Not applicable.*
+
+## 7. System Design Insights (if applicable)
+If no system design content, write: *Not applicable for this video.*
+
+## 8. Interview Insights
+Include common questions, edge cases, pitfalls, and quick verbal hooks where relevant.
+
+## 9. Quick Revision Summary
+Ultra-dense bullet checklist of what to remember.
+
+## 10. Key Takeaways
+3–8 bullets: the non-negotiable ideas from this video.
+
+Begin directly with the `#` heading line (no preamble).

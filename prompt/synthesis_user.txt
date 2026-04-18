@@ -1,0 +1,19 @@
+Below are Markdown notes collected from each video in a playlist (playlist order preserved in the separators).
+
+Your task:
+
+1. Merge into **one** cohesive interview-revision document. Infer a sensible top-level `#` title for the playlist or course theme.
+2. **Remove duplication and redundancy** across videos: state each idea once; add brief cross-references (e.g. “see also: …”) when two videos reinforce the same pattern.
+3. **Resolve overlaps** by grouping related ideas under shared headings; if two videos contradict, note both neutrally in one short clarification.
+4. **Preserve non-redundant technical detail**: definitions, algorithms, steps, code patterns, complexity, and system-design components—do not collapse into vague summaries.
+5. **Structure for scanning**: use `#`, `##`, `###`, and bullets; put the heaviest detail in “Core” / “Technical details” style sections.
+6. Include a final **Concept index** (terms or topics --> section heading) so the reader can jump quickly.
+7. Add a short **Playlist-wide interview insights** subsection: recurring themes, comparisons, and pitfalls that span multiple videos (only if supported by the notes).
+
+Use plain-text complexity notation and --> for arrows throughout.
+
+Here is the combined raw notes:
+
+---
+{combined_raw}
+---
