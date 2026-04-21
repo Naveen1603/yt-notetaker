@@ -11,7 +11,7 @@ the per-video pass completes.
 Requirements:
   - API keys in project `.env` (loaded automatically) or exported in the shell
   - pip install -r requirements.txt (``google.generativeai`` — legacy SDK, matches AI Studio snippets)
-  - Prompts in `prompt/*.txt` (edit to tune behavior)
+  - Prompts in ``prompt/*.txt`` by default; use ``--prompt-dir`` for another folder (e.g. ``lc_prompt``)
   - Optional: `GEMINI_REQUEST_TIMEOUT` (seconds) for ``RequestOptions`` timeouts on API calls
 
 Example:
@@ -46,7 +46,7 @@ with warnings.catch_warnings():
     from google.generativeai.types import RequestOptions
 
 _PROJECT_ROOT = Path(__file__).resolve().parent
-_PROMPT_DIR = _PROJECT_ROOT / "prompt"
+DEFAULT_PROMPT_SUBDIR = "prompt"
 DEFAULT_OUT_DIR = _PROJECT_ROOT / "results" / "ytnotes"
 DEFAULT_MODEL = "gemini-2.5-flash"
 # Per HTTP call (``RequestOptions``); overridable via ``--request-timeout-seconds`` / ``GEMINI_REQUEST_TIMEOUT``.
@@ -97,21 +97,29 @@ def _env_float(name: str, default: float) -> float:
         return default
 
 
-def _read_prompt_file(name: str) -> str:
-    path = _PROMPT_DIR / name
+def _resolve_prompt_dir(raw: str) -> Path:
+    """Resolve ``--prompt-dir`` relative to ``yt-notetaker/`` when not absolute."""
+    p = Path(raw).expanduser()
+    if not p.is_absolute():
+        p = (_PROJECT_ROOT / p).resolve()
+    return p
+
+
+def _read_prompt_file(prompt_dir: Path, name: str) -> str:
+    path = prompt_dir / name
     if not path.is_file():
         print(f"Missing prompt file: {path}", file=sys.stderr)
         sys.exit(1)
     return path.read_text(encoding="utf-8").strip()
 
 
-def load_prompt_bundle() -> tuple[str, str, str, str]:
+def load_prompt_bundle(prompt_dir: Path) -> tuple[str, str, str, str]:
     """Returns per_video_system, per_video_user_template, synthesis_system, synthesis_user_template."""
     return (
-        _read_prompt_file("per_video_system.txt"),
-        _read_prompt_file("per_video_user.txt"),
-        _read_prompt_file("synthesis_system.txt"),
-        _read_prompt_file("synthesis_user.txt"),
+        _read_prompt_file(prompt_dir, "per_video_system.txt"),
+        _read_prompt_file(prompt_dir, "per_video_user.txt"),
+        _read_prompt_file(prompt_dir, "synthesis_system.txt"),
+        _read_prompt_file(prompt_dir, "synthesis_user.txt"),
     )
 
 
@@ -396,6 +404,14 @@ def main(special_instructions: str = "") -> None:
         help=f"Directory for raw notes, final notes, and manifest (default: {DEFAULT_OUT_DIR})",
     )
     parser.add_argument(
+        "--prompt-dir",
+        default=DEFAULT_PROMPT_SUBDIR,
+        help=(
+            "Folder under yt-notetaker containing per_video_*.txt and synthesis_*.txt "
+            f"(default: {DEFAULT_PROMPT_SUBDIR}). Absolute paths allowed."
+        ),
+    )
+    parser.add_argument(
         "--model",
         default=os.environ.get("GEMINI_MODEL", DEFAULT_MODEL),
         help=f"Gemini model id (default: {DEFAULT_MODEL} or GEMINI_MODEL env)",
@@ -451,6 +467,11 @@ def main(special_instructions: str = "") -> None:
     )
     args = parser.parse_args()
 
+    prompt_dir = _resolve_prompt_dir(args.prompt_dir)
+    if not prompt_dir.is_dir():
+        print(f"Prompt directory not found or not a directory: {prompt_dir}", file=sys.stderr)
+        sys.exit(1)
+
     run_extra = (args.special_instructions or "").strip() or special_instructions.strip()
 
     playlist_url = (args.playlist_url or os.environ.get("YT_PLAYLIST_URL") or "").strip()
@@ -460,7 +481,7 @@ def main(special_instructions: str = "") -> None:
         )
 
     per_video_system, per_video_user_t, synthesis_system, synthesis_user_t = (
-        load_prompt_bundle()
+        load_prompt_bundle(prompt_dir)
     )
 
     out_dir = Path(args.out_dir)
@@ -494,6 +515,11 @@ def main(special_instructions: str = "") -> None:
 
     if run_extra:
         manifest["special_instructions"] = run_extra
+
+    try:
+        manifest["prompt_dir"] = str(prompt_dir.relative_to(_PROJECT_ROOT))
+    except ValueError:
+        manifest["prompt_dir"] = str(prompt_dir)
 
     completed_ids = {
         v["id"]
@@ -630,13 +656,11 @@ def main(special_instructions: str = "") -> None:
 
 
 if __name__ == "__main__":
-    # Default extra instructions when `--special-instructions` is not passed on the CLI
-    # (CLI wins when non-empty). Tailor for Striver Graph playlist: Java/C++ -> Python 3.
+    # Default when `--special-instructions` is empty (CLI overrides when set).
+    # Many DSA playlists use C++/Java on screen; LeetCode-style output below expects Python 3 in ## Code.
     SPECIAL_INSTRUCTIONS = (
-        "This playlist uses Java/C++ in the source material. For every code example and "
-        "algorithm walkthrough, provide an equivalent Python 3 solution instead (idiomatic "
-        "where reasonable, type hints optional). Preserve logic, complexity discussion, and "
-        "edge cases; do not omit steps—translate faithfully."
+        "On-screen code is often C++ or Java. In ## Code, give an equivalent Python 3 solution "
+        "(idiomatic, type hints optional) that matches the video’s logic, complexity, and edge cases."
     )
 
     main(special_instructions=SPECIAL_INSTRUCTIONS)

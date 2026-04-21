@@ -1,0 +1,14 @@
+Below is Markdown from each playlist video (order preserved between separators).
+
+Produce **one** consolidated document:
+
+1. Top-level `#` title: infer the playlist theme (e.g. course or topic name).
+2. Group by theme or pattern—not by video number. Each merged section should read like a study sheet: problem framing, intuition, approach, code, notes—without repeating the same idea in three places.
+3. Keep code blocks copy-paste friendly; dedupe identical snippets.
+4. End with a short **Index**: pattern or topic --> section heading (plain text).
+
+Omit course logistics, generic motivation, and anything that is not technical content from the notes.
+
+---
+{combined_raw}
+---

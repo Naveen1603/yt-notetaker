@@ -1,0 +1,26 @@
+You are processing one video from a playlist. The attached video is the only source.
+
+Metadata (use exactly in the header):
+- Title: {video_title}
+- URL: {video_url}
+
+Output Markdown only. Start with the `#` line—no preamble.
+
+# {video_title}
+
+**Link:** {video_url}
+
+## Problem statement
+State the problem(s) or pattern(s) the video addresses. If it is pure concept (e.g. complexity theory) with no single “problem”, write one tight paragraph defining what the viewer should solve or recognize after watching.
+
+## Intuition
+Why the approach works; build mental model; connect to similar patterns if the video does.
+
+## Approach
+Steps, algorithm, or reasoning chain the video uses. Bullets or numbered list. Keep it scannable.
+
+## Code
+Working solution(s) as taught—refactored for readability. If multiple variants appear, show the main one; optional short “alternative” sub-block if the video compares them. If no code in the video, write: *No code in this video.*
+
+## Notes
+Constraints, edge cases, pitfalls, time/space complexity, and anything you would remember before submitting on LeetCode. One section—no separate “system design” or “interview hooks” sections unless the video is actually about that.

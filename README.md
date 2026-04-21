@@ -28,10 +28,20 @@ Run from the `yt-notetaker` directory (or pass paths accordingly):
 python youtube_playlist_gemini_notes.py "https://www.youtube.com/playlist?list=PLxxxx" --out-dir results/my_playlist
 ```
 
-Use a **separate `--out-dir` per playlist** so outputs do not overwrite each other. Resume after interruption:
+Use a **separate `--out-dir` per playlist or topic** (e.g. `results/leetcode_course` vs `results/system_design`) so notes and manifests never clash.
+
+Use **`--prompt-dir`** to pick a template set under `yt-notetaker/` (default: `prompt`). Example: LeetCode-oriented copies in `lc_prompt/`.
 
 ```bash
-python youtube_playlist_gemini_notes.py "PLAYLIST_URL" --out-dir results/my_playlist --skip-existing
+python youtube_playlist_gemini_notes.py "PLAYLIST_URL" \
+  --out-dir results/leetcode_course \
+  --prompt-dir lc_prompt
+```
+
+Resume after interruption:
+
+```bash
+python youtube_playlist_gemini_notes.py "PLAYLIST_URL" --out-dir results/my_playlist --prompt-dir lc_prompt --skip-existing
 ```
 
 Regenerate only the final document from an existing raw file:
@@ -40,7 +50,7 @@ Regenerate only the final document from an existing raw file:
 python youtube_playlist_gemini_notes.py --only-synthesize --out-dir results/my_playlist
 ```
 
-**Common options:** `--model`, `--max-videos`, `--delay-seconds`, `--request-timeout-seconds`, `--synthesis-request-timeout-seconds`, `--special-instructions`. See `python youtube_playlist_gemini_notes.py --help`.
+**Common options:** `--prompt-dir`, `--model`, `--max-videos`, `--delay-seconds`, `--request-timeout-seconds`, `--synthesis-request-timeout-seconds`, `--special-instructions`. See `python youtube_playlist_gemini_notes.py --help`.
 
 ## Outputs
 
@@ -50,14 +60,14 @@ All paths are relative to **`--out-dir`** (default: `results/ytnotes` under this
 |------|---------|
 | `notes_raw.md` | Per-video sections |
 | `notes_comprehensive.md` | Synthesized notes |
-| `manifest.json` | Run metadata and per-video status |
+| `manifest.json` | Run metadata, per-video status, and `prompt_dir` used for that run |
 | `errors.log` | Error-level logs |
 
 Generated content and `.env` are gitignored.
 
 ## Customization
 
-- **`prompt/`** — system/user templates for per-video calls and for synthesis (`{video_title}`, `{video_url}`, `{combined_raw}`).
+- **`prompt/`** (default) — templates for per-video and synthesis (`{video_title}`, `{video_url}`, `{combined_raw}`). Add folders like **`lc_prompt/`** for other layouts and pass `--prompt-dir lc_prompt`.
 - **`youtube_playlist_gemini_notes.py`** — default per-run instructions live in `SPECIAL_INSTRUCTIONS` in the `__main__` block; override with `--special-instructions` when needed.
 
 **PDF:** `python md_to_pdf.py path/to/notes.md -o path/to/out.pdf` — use `--help` for layout options.
